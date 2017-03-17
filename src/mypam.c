@@ -71,11 +71,10 @@ static int getUrl(const char* pUrl, const char* pClient, const char* pUsername, 
 	sprintf(pUserPass, dataFormat, pUsername, pPassword);
 
 	char* pAuthHeader;
-	char* pAuthHeaderLine = "Authorization: Basic ";
-	int authLen = strlen(pAuthHeaderLine) + strlen(pClient);
+	char* pAuthHeaderLine = "Authorization: Basic %s";
+	int authLen = strlen(pAuthHeaderLine) + strlen(pClient) + 1;
 	pAuthHeader = malloc(authLen);
-	strcat(pAuthHeader, pAuthHeaderLine);
-	strcat(pAuthHeader, pClient);
+	sprintf(pAuthHeader, pAuthHeaderLine, pClient);
 
 	// create client auth header options
 	struct curl_slist *list = NULL;
