@@ -75,7 +75,7 @@ static int getUrl(const char* pUrl, const char* pClient, const char* pUsername, 
 	int authLen = strlen(pAuthHeaderLine) + strlen(pClient);
 	pAuthHeader = malloc(authLen);
 	strcat(pAuthHeader, pAuthHeaderLine);
-	srtcat(pAuthHeader, pClient);
+	strcat(pAuthHeader, pClient);
 
 	// create client auth header options
 	struct curl_slist *list = NULL;
