@@ -133,27 +133,30 @@ PAM_EXTERN int pam_sm_authenticate(pam_handle_t* pamh, int flags, int argc, cons
 	fprintf(stderr, "Attempting Auth for Ping Fed\n"); //Debug line
 
 	if (pam_get_user(pamh, &pUsername, NULL) != PAM_SUCCESS) {
+		fprintf(stderr, "Getting User failed");
 		return PAM_AUTH_ERR;
 	}
 
 	pUrl = getArg("url", argc, argv);
 	if (!pUrl) {
+		fprintf(stderr, "Getting url arg failed");
 		return PAM_AUTH_ERR;
 	}
-	fprintf(stdout, "pUrl:%s", pUrl);
+	fprintf(stderr, "pUrl:%s", pUrl);
 
 	pClient = getArg("client", argc, argv);
 	if (!pClient) {
+		fprintf(stderr, "Getting client arg failed");
 		return PAM_AUTH_ERR;
 	}
-	fprintf(stdout, "pClient:%s", pClient);
+	fprintf(stderr, "pClient:%s", pClient);
 
 	pCaFile = getArg("cafile", argc, argv);
 	if (pam_get_item(pamh, PAM_CONV, (const void**)&pItem) != PAM_SUCCESS || !pItem) {
 		fprintf(stderr, "Couldn't get pam_conv\n");
 		return PAM_AUTH_ERR;
 	}
-	fprintf(stdout, "pCaFile:%s", pCaFile);
+	fprintf(stderr, "pCaFile:%s", pCaFile);
 
 	pItem->conv(1, &pMsg, &pResp, pItem->appdata_ptr);
 
