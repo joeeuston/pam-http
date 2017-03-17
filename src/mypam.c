@@ -84,7 +84,7 @@ static int getUrl(const char* pUrl, const char* pClient, const char* pUsername, 
 
 	fprintf(stderr, "Building Curl\n");
 	fprintf(stderr, "pUserPass:%s\n", pUserPass);
-	fprintf(stderr, "pAuthHeaderLine:%s\n", pAuthHeaderLine);
+	fprintf(stderr, "pAuthHeader:%s\n", pAuthHeader);
 
 	curl_easy_setopt(pCurl, CURLOPT_URL, pUrl);
 	curl_easy_setopt(pCurl, CURLOPT_POST, 1);
@@ -111,7 +111,7 @@ static int getUrl(const char* pUrl, const char* pClient, const char* pUsername, 
 	free(pAuthHeader);
 	curl_easy_cleanup(pCurl);
 
-	printf("Res: %d\n", res);
+	fprintf(stderr, "Res: %d\n", res);
 
 	return res;
 }
