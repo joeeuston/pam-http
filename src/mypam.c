@@ -50,6 +50,7 @@ static const char* getArg(const char* pName, int argc, const char** argv) {
  * @return Number of bytes actually handled. If different from len * size, curl will throw an error
  */
 static int writeFn(void* buf, size_t len, size_t size, void* userdata) {
+	fprintf(stderr, "%.*s", len, (char*)userdata);
 	return len * size;
 }
 
