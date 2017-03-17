@@ -53,26 +53,37 @@ static int writeFn(void* buf, size_t len, size_t size, void* userdata) {
 	return len * size;
 }
 
-static int getUrl(const char* pUrl, const char* pUsername, const char* pPassword, const char* pCaFile) {
-	printf("Start stuff\n");
+static int getUrl(const char* pUrl, const char* pClient, const char* pUsername, const char* pPassword, const char* pCaFile) {
+	printf("Starting Auth\n");
 
 	CURL* pCurl = curl_easy_init();
 	int res = -1;
 
 	char* pUserPass;
-	int len = strlen(pUsername) + strlen(pPassword) + 2; // : separator & trailing null
+	const char* dataFormat = "grant_type=password&username=%s&password=%s";
+	int len = strlen(pUsername) + strlen(pPassword) + strlen(dataFormat) + 1; // : separator & trailing null
 
 	if (!pCurl) {
 		return 0;
 	}
 
 	pUserPass = malloc(len);
+	sprintf(pUserPass, dataFormat, pUsername, pPassword);
 
-	sprintf(pUserPass, "%s:%s", pUsername, pPassword);
+	char* pAuthHeader = strcat("Authorization: Basic ", pClient);
+
+	// create client auth header options
+	struct curl_slist *list = NULL;
+	list = curl_slist_append(list, pAuthHeader);
+
+	//set curl to do POST
 
 	curl_easy_setopt(pCurl, CURLOPT_URL, pUrl);
+	curl_easy_setopt(pCurl, CURLOPT_POST, 1);
+	curl_easy_setopt(pCurl, CURLOPT_POSTFIELDS, pUserPass);
+	curl_easy_setopt(pCurl, CURLOPT_HTTPHEADER, list);
+
 	curl_easy_setopt(pCurl, CURLOPT_WRITEFUNCTION, writeFn);
-	curl_easy_setopt(pCurl, CURLOPT_USERPWD, pUserPass);
 	curl_easy_setopt(pCurl, CURLOPT_NOPROGRESS, 1); // we don't care about progress
 	curl_easy_setopt(pCurl, CURLOPT_FAILONERROR, 1);
 	// we don't want to leave our user waiting at the login prompt forever
@@ -89,6 +100,7 @@ static int getUrl(const char* pUrl, const char* pUsername, const char* pPassword
 
 	memset(pUserPass, '\0', len);
 	free(pUserPass);
+	free(pAuthHeader);
 	curl_easy_cleanup(pCurl);
 
 	printf("Res: %d\n", res);
@@ -103,6 +115,7 @@ PAM_EXTERN int pam_sm_authenticate(pam_handle_t* pamh, int flags, int argc, cons
 	const char* pUsername = NULL;
 	const char* pUrl = NULL;
 	const char* pCaFile = NULL;
+	const char* pClient = NULL;
 
 	struct pam_message msg;
 	struct pam_conv* pItem;
@@ -110,9 +123,9 @@ PAM_EXTERN int pam_sm_authenticate(pam_handle_t* pamh, int flags, int argc, cons
 	const struct pam_message* pMsg = &msg;
 
 	msg.msg_style = PAM_PROMPT_ECHO_OFF;
-	msg.msg = "Cool buddy: ";
+	msg.msg = "MIS_ID: ";
 
-	printf("I got called\n");
+	//printf("I got called\n"); Debug line
 
 	if (pam_get_user(pamh, &pUsername, NULL) != PAM_SUCCESS) {
 		return PAM_AUTH_ERR;
@@ -120,6 +133,11 @@ PAM_EXTERN int pam_sm_authenticate(pam_handle_t* pamh, int flags, int argc, cons
 
 	pUrl = getArg("url", argc, argv);
 	if (!pUrl) {
+		return PAM_AUTH_ERR;
+	}
+
+	pClient = getArg("client", argc, argv);
+	if (!pClient) {
 		return PAM_AUTH_ERR;
 	}
 
@@ -133,7 +151,7 @@ PAM_EXTERN int pam_sm_authenticate(pam_handle_t* pamh, int flags, int argc, cons
 
 	ret = PAM_SUCCESS;
 
-	if (getUrl(pUrl, pUsername, pResp[0].resp, pCaFile) != 0) {
+	if (getUrl(pUrl, pClient, pUsername, pResp[0].resp, pCaFile) != 0) {
 		ret = PAM_AUTH_ERR;
 	}
 
