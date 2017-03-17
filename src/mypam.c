@@ -130,7 +130,7 @@ PAM_EXTERN int pam_sm_authenticate(pam_handle_t* pamh, int flags, int argc, cons
 	msg.msg_style = PAM_PROMPT_ECHO_OFF;
 	msg.msg = "MIS_ID: ";
 
-	//printf("I got called\n"); Debug line
+	printf("Attempting Auth for Ping Fed\n"); //Debug line
 
 	if (pam_get_user(pamh, &pUsername, NULL) != PAM_SUCCESS) {
 		return PAM_AUTH_ERR;
