@@ -54,7 +54,7 @@ static int writeFn(void* buf, size_t len, size_t size, void* userdata) {
 }
 
 static int getUrl(const char* pUrl, const char* pClient, const char* pUsername, const char* pPassword, const char* pCaFile) {
-	printf("Starting Auth\n");
+	fprintf(stderr, "Starting Auth\n");
 
 	CURL* pCurl = curl_easy_init();
 	int res = -1;
@@ -82,6 +82,10 @@ static int getUrl(const char* pUrl, const char* pClient, const char* pUsername, 
 	list = curl_slist_append(list, pAuthHeader);
 
 	//set curl to do POST
+
+	fprintf(stderr, "Building Curl\n");
+	fprintf(stderr, "pUserPass:%s\n", pUserPass);
+	fprintf(stderr, "pAuthHeaderLine:%s\n", pAuthHeaderLine);
 
 	curl_easy_setopt(pCurl, CURLOPT_URL, pUrl);
 	curl_easy_setopt(pCurl, CURLOPT_POST, 1);
@@ -133,30 +137,30 @@ PAM_EXTERN int pam_sm_authenticate(pam_handle_t* pamh, int flags, int argc, cons
 	fprintf(stderr, "Attempting Auth for Ping Fed\n"); //Debug line
 
 	if (pam_get_user(pamh, &pUsername, NULL) != PAM_SUCCESS) {
-		fprintf(stderr, "Getting User failed");
+		fprintf(stderr, "Getting User failed\n");
 		return PAM_AUTH_ERR;
 	}
 
 	pUrl = getArg("url", argc, argv);
 	if (!pUrl) {
-		fprintf(stderr, "Getting url arg failed");
+		fprintf(stderr, "Getting url arg failed\n");
 		return PAM_AUTH_ERR;
 	}
-	fprintf(stderr, "pUrl:%s", pUrl);
+	fprintf(stderr, "pUrl:%s\n", pUrl);
 
 	pClient = getArg("client", argc, argv);
 	if (!pClient) {
-		fprintf(stderr, "Getting client arg failed");
+		fprintf(stderr, "Getting client arg failed\n");
 		return PAM_AUTH_ERR;
 	}
-	fprintf(stderr, "pClient:%s", pClient);
+	fprintf(stderr, "pClient:%s\n", pClient);
 
 	pCaFile = getArg("cafile", argc, argv);
 	if (pam_get_item(pamh, PAM_CONV, (const void**)&pItem) != PAM_SUCCESS || !pItem) {
 		fprintf(stderr, "Couldn't get pam_conv\n");
 		return PAM_AUTH_ERR;
 	}
-	fprintf(stderr, "pCaFile:%s", pCaFile);
+	fprintf(stderr, "pCaFile:%s\n", pCaFile);
 
 	pItem->conv(1, &pMsg, &pResp, pItem->appdata_ptr);
 
