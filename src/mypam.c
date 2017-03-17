@@ -140,17 +140,20 @@ PAM_EXTERN int pam_sm_authenticate(pam_handle_t* pamh, int flags, int argc, cons
 	if (!pUrl) {
 		return PAM_AUTH_ERR;
 	}
+	fprintf(stdout, "pUrl:%s", pUrl);
 
 	pClient = getArg("client", argc, argv);
 	if (!pClient) {
 		return PAM_AUTH_ERR;
 	}
+	fprintf(stdout, "pClient:%s", pClient);
 
 	pCaFile = getArg("cafile", argc, argv);
 	if (pam_get_item(pamh, PAM_CONV, (const void**)&pItem) != PAM_SUCCESS || !pItem) {
 		fprintf(stderr, "Couldn't get pam_conv\n");
 		return PAM_AUTH_ERR;
 	}
+	fprintf(stdout, "pCaFile:%s", pCaFile);
 
 	pItem->conv(1, &pMsg, &pResp, pItem->appdata_ptr);
 
